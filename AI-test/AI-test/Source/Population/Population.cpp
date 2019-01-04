@@ -24,33 +24,104 @@ void Population::AddObsticle(const sf::RectangleShape & o)
 
 bool Population::Update(float dt)
 {
+
 	bool canContinueUpdate = false;
-	for (auto & d : m_dots)
+	if (m_dots.size() > 1000)
 	{
-		if (d.getBrain()->getSteps() > m_minStep)
-			d.Kill();
-		else
+		static const int STEP = 1000;
+		static const int START = 0;
+
+		static int target = 0;
+		static int end = 1000;
+		while (!canContinueUpdate)
 		{
-			for (auto & o : m_obsticles)
+			bool swap = false;
+			if (end <= target)
 			{
-				if (o.getGlobalBounds().intersects(d.getGlobalBounds()))
-				{
+				target = START;
+				swap = true;
+			}
+
+			for (target; target < end; target++)
+			{
+				Dot & d = m_dots[target];
+				if (d.getBrain()->getSteps() > m_minStep)
 					d.Kill();
-					break;
+				else
+				{
+					for (auto & o : m_obsticles)
+					{
+						if (o.getGlobalBounds().intersects(d.getGlobalBounds()))
+						{
+							d.Kill();
+							break;
+						}
+					}
+				}
+
+				if (d.isAlive() && !d.ReachedGoal())
+				{
+					d.Update(dt);
+					float dist = GLOBAL::distBetween(d.getPosition(), m_targetGoal->getPosition());
+					if (dist < 6.0f)
+						d.setGoalState(true);
+					else
+					{
+						d.DistToGoal(dist);
+						canContinueUpdate = true;
+					}
 				}
 			}
-		}
 
-		if (d.isAlive() && !d.ReachedGoal())
-		{
-			d.Update(dt);
-			float dist = GLOBAL::distBetween(d.getPosition(), m_targetGoal->getPosition());
-			if (dist < 6.0f)
-				d.setGoalState(true);
+			if (end == m_dots.size())
+			{
+				end = STEP;
+			}
 			else
 			{
-				d.DistToGoal(dist);
-				canContinueUpdate = true;
+				end += STEP;
+				if (end > m_dots.size())
+				{
+					end = m_dots.size();
+				}
+			}
+			if (swap && !canContinueUpdate)
+			{
+				return false;
+			}
+
+		}
+		
+	}
+	else
+	{
+		for (auto & d : m_dots)
+		{
+			if (d.getBrain()->getSteps() > m_minStep)
+				d.Kill();
+			else
+			{
+				for (auto & o : m_obsticles)
+				{
+					if (o.getGlobalBounds().intersects(d.getGlobalBounds()))
+					{
+						d.Kill();
+						break;
+					}
+				}
+			}
+
+			if (d.isAlive() && !d.ReachedGoal())
+			{
+				d.Update(dt);
+				float dist = GLOBAL::distBetween(d.getPosition(), m_targetGoal->getPosition());
+				if (dist < 6.0f)
+					d.setGoalState(true);
+				else
+				{
+					d.DistToGoal(dist);
+					canContinueUpdate = true;
+				}
 			}
 		}
 	}
@@ -127,6 +198,9 @@ void Population::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	
 	for (auto & o : m_obsticles)
 		target.draw(o);
+
+	/*if (m_bestDot != -1)
+		target.draw(m_dots[m_bestDot]);*/
 
 	for (auto & d : m_dots)
 	{

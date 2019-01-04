@@ -23,7 +23,7 @@ int main()
 	srand(static_cast<unsigned>(time(0)));
 	sf::RenderWindow window(sf::VideoMode(GLOBAL::screenSize.x, GLOBAL::screenSize.y), "Test");
 	
-	int popSize = 2000;
+	int popSize = 10000;
 	bool sleptLastFrame = false;
 	Population myPop(popSize);
 
@@ -37,9 +37,6 @@ int main()
 	o.setOutlineColor(sf::Color::Black);
 	myPop.AddObsticle(o);
 
-	o.setFillColor(sf::Color::Cyan);
-	o.setPosition(GLOBAL::screenSize.x * 0.5f, 200.0f);
-	myPop.AddObsticle(o);
 
 	o.setPosition(GLOBAL::screenSize.x, GLOBAL::screenSize.y * 0.5f);
 	o.setFillColor(sf::Color::Magenta);
@@ -48,10 +45,22 @@ int main()
 	o.setPosition(0.0f, GLOBAL::screenSize.y * 0.5f);
 	myPop.AddObsticle(o);
 
+	o.setFillColor(sf::Color::Cyan);
+	o.setPosition(GLOBAL::screenSize.x * 0.5f, 200.0f);
+	o.setSize(sf::Vector2f(GLOBAL::screenSize.x, 20.0));
+	myPop.AddObsticle(o);
+
+
+	o.setFillColor(sf::Color::Yellow);
+	o.setPosition(GLOBAL::screenSize.x * 0.5f + 100, GLOBAL::screenSize.y * 0.63f);
+	oSize = sf::Vector2f(20.0f, 200.0f);
+	o.setSize(oSize);
+	o.setOrigin(oSize * 0.5f);
+	myPop.AddObsticle(o);
 
 	std::cout << "Generation: " << myPop.getGeneration() << std::endl;
 
-	const double GAME_SPEED = 1000.0;
+	const double GAME_SPEED = 2000;
 
 
 	double t = 0.0;
@@ -65,6 +74,10 @@ int main()
 	
 	while (window.isOpen())
 	{
+		window.clear(sf::Color::White);
+		window.draw(myPop);
+		window.display();
+
 		t += timer.Stop();
 		if (firstRun)
 		{

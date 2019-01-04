@@ -121,7 +121,8 @@ void Dot::CalculateFitness(const sf::Vector2f & pos)
 	}
 	else
 	{
-		float _l = std::min(GLOBAL::distBetween(m_spr.getPosition(), pos), m_closestYet );
+		//float _l = std::min(GLOBAL::distBetween(m_spr.getPosition(), pos), m_closestYet );
+		float _l = GLOBAL::distBetween(m_spr.getPosition(), pos);
 		if (_l == 0.0f)
 			m_fitness = FLT_MAX;
 		else

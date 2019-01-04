@@ -25,7 +25,7 @@ void Brain::Mutate()
 {
 	for (auto & d : m_directions)
 	{
-		bool mutate = (rand() % 100) == 0;
+		bool mutate = (rand() % 50) == 0;
 
 		if (mutate)
 		{
